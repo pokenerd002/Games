@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090d18">
+<title>Game Hub — Your Game Collection</title>
+<style>
+:root{color-scheme:dark;--bg:#090d18;--panel:#141c2c;--line:#29364d;--muted:#aab7cc;--accent:#70e1ff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -20%,#26395c 0%,#10182a 40%,var(--bg) 78%);color:#f7f9ff;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+button{font:inherit}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px clamp(16px,4vw,56px);border-bottom:1px solid #ffffff14;background:#080d18b8;backdrop-filter:blur(12px);position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.08em}
+.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#48d7f4,#7666ff);font-size:22px;box-shadow:0 8px 28px #4b9fff44}
+.top-note{color:var(--muted);font-size:13px}
+main{width:min(1180px,92vw);margin:auto;padding:52px 0 70px}
+.hero{text-align:center;margin:12px auto 42px;max-width:760px}
+.eyebrow{color:#75e4ff;text-transform:uppercase;letter-spacing:.2em;font-size:12px;font-weight:800}
+h1{font-size:clamp(38px,7vw,68px);line-height:1.02;margin:13px 0 14px;letter-spacing:-.045em}
+.hero p{color:#b8c4d8;font-size:17px;line-height:1.6;margin:0}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 18px}
+.toolbar h2{font-size:20px;margin:0}
+.count{font-size:12px;color:#b7c5dc;border:1px solid var(--line);padding:7px 11px;border-radius:999px;background:#111a2a}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px}
+.game-card{overflow:hidden;border:1px solid #34415a;border-radius:20px;background:linear-gradient(145deg,#19243a,#101827);box-shadow:0 14px 40px #0003;transition:transform .2s,border-color .2s,box-shadow .2s}
+.game-card:hover{transform:translateY(-5px);border-color:#75dfff;box-shadow:0 20px 48px #0005}
+.game-art{height:175px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#263b5b,#10192b)}
+.game-art:before,.game-art:after{content:"";position:absolute;border:1px solid #ffffff20;border-radius:50%;width:220px;height:220px;transform:rotate(-25deg)}
+.game-art:after{width:150px;height:150px}
+.game-art span{font-size:78px;filter:drop-shadow(0 10px 12px #0008);z-index:1}
+.game-art small{position:absolute;top:13px;left:14px;background:#07101dbd;border:1px solid #ffffff25;padding:6px 9px;border-radius:99px;color:#e6f4ff;font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+.monster .game-art{background:linear-gradient(135deg,#3c2537,#121a2b 70%)}
+.vice .game-art{background:linear-gradient(135deg,#176a80,#25336b 70%)}
+.last .game-art{background:linear-gradient(135deg,#254e3c,#172b31 70%)}
+.block .game-art{background:linear-gradient(135deg,#6c583e,#283e45 70%)}
+.wild .game-art{background:linear-gradient(135deg,#47613d,#273b33 70%)}
+.game-info{padding:19px}
+.game-info h2{margin:0 0 7px;font-size:22px}
+.game-info p{color:#aebbd0;min-height:42px;line-height:1.5;margin:0 0 18px;font-size:14px}
+.play-button{border:0;border-radius:11px;padding:11px 16px;color:#06101c;font-weight:900;background:linear-gradient(100deg,#72e5ff,#9d9aff);cursor:pointer;width:100%;transition:filter .15s,transform .15s}
+.play-button:hover{filter:brightness(1.1);transform:scale(1.015)}
+footer{text-align:center;color:#77869e;font-size:12px;margin-top:38px}
+#playerView{display:none;position:fixed;inset:0;background:#05070c;z-index:20}
+.playerbar{height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;background:#101827;border-bottom:1px solid #33415a}
+.playerbar strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-actions{display:flex;gap:8px}
+.player-actions button{border:1px solid #43516b;background:#202d43;color:#fff;border-radius:8px;padding:7px 11px;cursor:pointer;font-weight:700;font-size:12px}
+.player-actions button:hover{background:#30415e}
+#gameFrame{display:block;width:100%;height:calc(100% - 52px);border:0;background:#000}
+@media(max-width:560px){main{padding-top:35px}.top-note{display:none}.game-art{height:145px}.game-art span{font-size:66px}.playerbar{padding:0 8px}.player-actions button{padding:7px 8px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">🎮</div><span>GAME HUB</span></div>
+  <div class="top-note">Your games · One place to play</div>
+</header>
+<main id="homeView">
+  <section class="hero">
+    <div class="eyebrow">Welcome to your arcade</div>
+    <h1>Pick a game.<br>Start playing.</h1>
+    <p>Your personal collection of games, all together in one website. Choose a game below to launch it.</p>
+  </section>
+  <div class="toolbar"><h2>Game Collection</h2><span class="count">5 GAMES</span></div>
+  <section class="game-grid">
+
+      <article class="game-card monster" data-game="monster-mayhem">
+        <div class="game-art"><span>🧟</span><small>3D FPS</small></div>
+        <div class="game-info">
+          <h2>Monster Mayhem</h2>
+          <p>Survive waves of monsters in a 3D arena.</p>
+          <button class="play-button" onclick="launchGame('monster-mayhem')">▶ Play Game</button>
+        </div>
+      </article>
+
+      <article class="game-card vice" data-game="vice-coast">
+        <div class="game-art"><span>🌴</span><small>Open World</small></div>
+        <div class="game-info">
+          <h2>Vice Coast 3D</h2>
+          <p>Explore an open-world coastal city.</p>
+          <button class="play-button" onclick="launchGame('vice-coast')">▶ Play Game</button>
+        </div>
+      </article>
+
+      <article class="game-card last" data-game="last-one-standing">
+        <div class="game-art"><span>🌿</span><small>Survival</small></div>
+        <div class="game-info">
+          <h2>Last One Standing</h2>
+          <p>Fight to be the last survivor in the jungle.</p>
+          <button class="play-button" onclick="launchGame('last-one-standing')">▶ Play Game</button>
+        </div>
+      </article>
+
+      <article class="game-card block" data-game="blockcraft">
+        <div class="game-art"><span>🧱</span><small>Sandbox</small></div>
+        <div class="game-info">
+          <h2>Blockcraft</h2>
+          <p>Build, explore, and survive in your own block world.</p>
+          <button class="play-button" onclick="launchGame('blockcraft')">▶ Play Game</button>
+        </div>
+      </article>
+
+      <article class="game-card wild" data-game="wilderness-hunter">
+        <div class="game-art"><span>🏹</span><small>Hunting & Exploration</small></div>
+        <div class="game-info">
+          <h2>Wilderness Hunter 3D</h2>
+          <p>Explore the wilderness and track wildlife.</p>
+          <button class="play-button" onclick="launchGame('wilderness-hunter')">▶ Play Game</button>
+        </div>
+      </article>
+  </section>
+  <footer>GAME HUB · Select any game to play. Your individual game saves remain in your browser.</footer>
+</main>
+<section id="playerView" aria-label="Game player">
+  <div class="playerbar">
+    <strong id="playingTitle">Now Playing</strong>
+    <div class="player-actions">
+      <button onclick="goHome()">← Game Library</button>
+      <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+  <iframe id="gameFrame" title="Selected game" allow="fullscreen; gamepad; autoplay; clipboard-read; clipboard-write" allowfullscreen></iframe>
+</section>
+<script>
+const GAME_FILES = {
+  "monster-mayhem": {title:"Monster Mayhem",src:"games/Monster_Mayhem_Updated.html"},
+  "vice-coast": {title:"Vice Coast 3D",src:"games/Vice_Coast_3D.html"},
+  "last-one-standing": {title:"Last One Standing",src:"games/Last_One_Standing.html"},
+  "blockcraft": {title:"Blockcraft",src:"games/Blockcraft.html"},
+  "wilderness-hunter": {title:"Wilderness Hunter 3D",src:"games/Wilderness_Hunter_3D.html"}
+};
+function launchGame(id){
+  const game=GAME_FILES[id];if(!game)return;
+  document.getElementById("playingTitle").textContent=game.title;
+  document.getElementById("gameFrame").src=game.src;
+  document.getElementById("homeView").style.display="none";
+  document.getElementById("playerView").style.display="block";
+  document.body.style.overflow="hidden";
+}
+function goHome(){
+  const frame=document.getElementById("gameFrame");
+  frame.src="about:blank";
+  document.getElementById("playerView").style.display="none";
+  document.getElementById("homeView").style.display="block";
+  document.body.style.overflow="";
+  if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
+}
+function toggleFullscreen(){
+  const player=document.getElementById("playerView");
+  if(!document.fullscreenElement)player.requestFullscreen?.().catch(()=>{});
+  else document.exitFullscreen?.().catch(()=>{});
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("playerView").style.display==="block"&&document.fullscreenElement){document.exitFullscreen().catch(()=>{});}});
+</script>
+</body>
+</html>
